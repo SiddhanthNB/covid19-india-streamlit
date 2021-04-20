@@ -46,11 +46,6 @@ covid_data = covid_data.sort_values('Total Cases', ascending=False )
 
 def main(): 
 	page = st.sidebar.selectbox("Choose a page", ["Homepage","Symptoms", "State-Wise Visualizations", "A Quick Note"])
-	st.sidebar.write("\n")
-	st.sidebar.write("\n")
-	st.sidebar.write("\n")
-	st.sidebar.write("\n")
-	st.sidebar.write("\n")
 	st.sidebar.info(
 		"This Project is made possible by [covid19india.org](https://www.covid19india.org/) and also it's [API.](https://github.com/covid19india/api) \n\n"
 		"This project is maintained by [Siddhanth](https://github.com/SiddhanthNB).")
