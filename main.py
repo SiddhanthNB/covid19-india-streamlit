@@ -1,41 +1,60 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import requests
-import json
 import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import matplotlib.pyplot as plt
 
-url = "https://api.covidindiatracker.com/state_data.json"
-JSONContent = requests.get(url).json()
+table =pd.read_csv('https://api.covid19india.org/csv/latest/states.csv')
+state_list= ['West Bengal', 'Uttarakhand', 'Uttar Pradesh', 'Tripura', 'Telangana',
+            'Tamil Nadu', 'Sikkim', 'Rajasthan', 'Punjab', 'Puducherry', 'Odisha', 
+            'Nagaland', 'Mizoram', 'Meghalaya', 'Manipur','Maharashtra', 'Madhya Pradesh',
+            'Lakshadweep', 'Ladakh', 'Kerala', 'Karnataka', 'Jharkhand', 'Jammu and Kashmir', 
+            'Himachal Pradesh', 'Haryana', 'Gujarat', 'Goa', 'Delhi', 
+            'Dadra and Nagar Haveli and Daman and Diu', 'Chhattisgarh', 'Chandigarh', 'Bihar', 
+            'Assam', 'Arunachal Pradesh', 'Andhra Pradesh', 'Andaman and Nicobar Islands' ]
+
+temp_list =[]
+for i in state_list:
+    tmpo = table[table["State"]== i]
+    tmpo = tmpo.iloc[-1:,1:5]
+    tmpo["Active"]=tmpo['Confirmed']-tmpo["Recovered"]-tmpo['Deceased']
+    lis = tmpo.values.tolist()
+    temp_list.append(lis[0])
 
 state = []
 active = []
 confirmed = []
 recovered =[]
 deaths = []
-for i in range(0,37):
-  if JSONContent[i]['confirmed'] > 0:       
-    state.append(JSONContent[i]['state'])   
-    confirmed.append(JSONContent[i]['confirmed'])
-    active.append(JSONContent[i]['active'])
-    recovered.append(JSONContent[i]['recovered'])
-    deaths.append(JSONContent[i]['deaths'])
-  else:
-    var = 1
-    temp = JSONContent[i]['state']
-data_list = [state,confirmed,active,recovered,deaths] 
+for i in range(len(temp_list)):
+    state.append(temp_list[i][0])
+    confirmed.append(temp_list[i][1])
+    recovered.append(temp_list[i][2])
+    deaths.append(temp_list[i][3])
+    active.append(temp_list[i][4])
+
+data_list = [state,confirmed,active,recovered,deaths]  
+
 covid_data = pd.DataFrame(data_list)
 covid_data = covid_data.transpose()
 covid_data.columns = ["State/UT","Total Cases","Active","Recovered","Deaths"]
+covid_data = covid_data.sort_values('Total Cases', ascending=False )
 #covid_data.to_csv("covid-19-statewise.csv")
 
 def main(): 
 	page = st.sidebar.selectbox("Choose a page", ["Homepage","Symptoms", "State-Wise Visualizations", "A Quick Note"])
-
+	st.sidebar.write("\n")
+    	st.sidebar.write("\n")
+    	st.sidebar.write("\n")
+    	st.sidebar.write("\n")
+    	st.sidebar.write("\n")
+    	st.sidebar.info(
+		"This Project is made possible by [covid19india.org](https://www.covid19india.org/) and also it's [API.](https://github.com/covid19india/api) \n\n"
+		"This project is maintained by [Siddhanth](https://github.com/SiddhanthNB).")
+    
 	if page == "Homepage":
 		df =covid_data.copy()
 		st.title("Covid-19 in India")
@@ -65,11 +84,7 @@ def main():
 		st.write('Total COVID-19 recoveries:', cured_cases)
 		st.write('Mortality rate in India till',todays_date,':', mortality_rate,"%")
 		st.write('Recovery rate in India till',todays_date,':', recovery_rate,"%")
-		
-		if var == 1:
-			st.sidebar.text("Did You Know??")
-			st.sidebar.text("State/UT with no Covid-19 cases is ")
-			st.sidebar.text(temp)
+
 	
  
 	elif page == "State-Wise Visualizations":
@@ -141,9 +156,7 @@ def main():
 		""")
 		st.title("Stay Home, Stay Safe!")
 		
-		
-		st.sidebar.text('This work is made possible by')
-		st.sidebar.text('https://covidindiatracker.com/')
+
 		
 
 @st.cache
